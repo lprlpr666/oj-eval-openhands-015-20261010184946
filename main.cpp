@@ -40,18 +40,27 @@ void insert_entry(const string &idx, int val) {
 void delete_entry(const string &idx, int val) {
     string path = file_path(idx);
     if (!fs::exists(path)) return;
-    vector<int> vals;
+    string tmp_path = path + ".tmp";
     ifstream fin(path);
+    ofstream fout(tmp_path);
     int x;
-    while (fin >> x) vals.push_back(x);
-    auto it = find(vals.begin(), vals.end(), val);
-    if (it == vals.end()) return;
-    vals.erase(it);
-    if (vals.empty()) {
+    bool removed = false;
+    while (fin >> x) {
+        if (!removed && x == val) {
+            removed = true; // skip this value
+            continue;
+        }
+        fout << x << '\n';
+    }
+    fin.close();
+    fout.close();
+    if (removed) {
+        // replace original with temp
         fs::remove(path);
+        fs::rename(tmp_path, path);
     } else {
-        ofstream fout(path, ios::trunc);
-        for (int y : vals) fout << y << '\n';
+        // no deletion, remove temp
+        fs::remove(tmp_path);
     }
 }
 
