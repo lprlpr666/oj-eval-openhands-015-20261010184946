@@ -15,7 +15,8 @@ string bucket_path(int id) {
 
 void ensure_buckets() {
     for (int i = 0; i < BUCKETS; ++i) {
-        ofstream ofs(bucket_path(i), ios::app); // create if not exists
+        // Truncate each bucket file to start fresh for each run
+        ofstream ofs(bucket_path(i), ios::trunc);
     }
 }
 
