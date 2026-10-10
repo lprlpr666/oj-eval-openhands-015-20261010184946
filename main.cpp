@@ -5,8 +5,11 @@ const int BUCKETS = 20;
 const string DATA_PREFIX = "bucket_"; // files: bucket_0.txt ...
 
 int bucket_id(const string &idx) {
-    static hash<string> hasher;
-    return (int)(hasher(idx) % BUCKETS);
+    unsigned long long h = 0;
+    for (unsigned char c : idx) {
+        h = h * 131 + c;
+    }
+    return (int)(h % BUCKETS);
 }
 
 string bucket_path(int id) {
@@ -15,8 +18,8 @@ string bucket_path(int id) {
 
 void ensure_buckets() {
     for (int i = 0; i < BUCKETS; ++i) {
-        // Truncate each bucket file to start fresh for each run
-        ofstream ofs(bucket_path(i), ios::trunc);
+        // Create bucket file if it does not exist; do not truncate existing data
+        std::ofstream ofs(bucket_path(i), std::ios::app);
     }
 }
 
